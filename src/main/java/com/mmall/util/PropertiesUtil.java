@@ -34,13 +34,34 @@ public class PropertiesUtil {
     }
 
     public static String getProperty(String key,String defaultValue){
-
         String value = props.getProperty(key.trim());
         if(StringUtils.isBlank(value)){
             value = defaultValue;
         }
         return value.trim();
     }
+
+    public static int getIntProperty(String key,String defaultValue){
+        String property = getProperty(key, defaultValue);
+        if(StringUtils.isBlank(property)){
+            return 0;
+        }else {
+            return Integer.parseInt(property);
+        }
+    }
+
+
+    public static Boolean getBooleanProperty(String key,String defaultValue){
+        String property = getProperty(key, defaultValue);
+        if(StringUtils.isBlank(property)){
+            return "true".equals(defaultValue)?true:false;
+        }else {
+            return "true".equals(property)?true:false;
+        }
+    }
+
+
+
 
 
 

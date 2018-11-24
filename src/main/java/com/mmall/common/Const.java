@@ -11,6 +11,9 @@ public class Const {
 
     public static final String CURRENT_USER = "currentUser";
 
+    //30分钟
+    public static final int  SESSION_EXTIME=30*60;
+
     public static final String EMAIL = "email";
     public static final String USERNAME = "username";
 
