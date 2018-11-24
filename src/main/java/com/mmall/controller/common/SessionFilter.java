@@ -4,7 +4,7 @@ import com.mmall.common.Const;
 import com.mmall.pojo.User;
 import com.mmall.util.CookieUtil;
 import com.mmall.util.JsonUtil;
-import com.mmall.util.RedisPoolUtil;
+import com.mmall.util.RedisSharedPoolUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.*;
@@ -25,11 +25,11 @@ public class SessionFilter implements Filter {
         String loginCookie = CookieUtil.readLoginCookie(request1);
         if(StringUtils.isNotEmpty(loginCookie)){
             //logintoken不为空,符合条件,取user
-            String s = RedisPoolUtil.get(loginCookie);
+            String s = RedisSharedPoolUtil.get(loginCookie);
             User user = JsonUtil.string2Bean(s, User.class);
             if(user!=null){
                 //user不为空,重置session时间
-                RedisPoolUtil.expire(loginCookie, Const.SESSION_EXTIME);
+                RedisSharedPoolUtil.expire(loginCookie, Const.SESSION_EXTIME);
 
             }
         }

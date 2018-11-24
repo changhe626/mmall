@@ -7,7 +7,7 @@ import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
 import com.mmall.util.CookieUtil;
 import com.mmall.util.JsonUtil;
-import com.mmall.util.RedisPoolUtil;
+import com.mmall.util.RedisSharedPoolUtil;
 import com.sun.corba.se.spi.activation.Server;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class UserController {
         if(response.isSuccess()){
             //session.setAttribute(Const.CURRENT_USER,response.getData());
             CookieUtil.writeLoginToken(httpServletResponse,session.getId());
-            RedisPoolUtil.setEx(session.getId(), JsonUtil.obj2String(response.getData()), Const.SESSION_EXTIME);
+            RedisSharedPoolUtil.setEx(session.getId(), JsonUtil.obj2String(response.getData()), Const.SESSION_EXTIME);
         }
         return response;
     }
@@ -80,7 +80,7 @@ public class UserController {
         if(StringUtils.isEmpty(loginCookie)){
             return ServerResponse.createByErrorMessage("用户未登录");
         }
-        String s = RedisPoolUtil.get(loginCookie);
+        String s = RedisSharedPoolUtil.get(loginCookie);
         User user = JsonUtil.string2Bean(s, User.class);
         if(user != null){
             return ServerResponse.createBySuccess(user);
@@ -119,7 +119,7 @@ public class UserController {
         if(StringUtils.isEmpty(loginCookie)){
             return ServerResponse.createByErrorMessage("用户未登录");
         }
-        String s = RedisPoolUtil.get(loginCookie);
+        String s = RedisSharedPoolUtil.get(loginCookie);
         User user = JsonUtil.string2Bean(s, User.class);
         if(user == null){
             return ServerResponse.createByErrorMessage("用户未登录");
@@ -136,7 +136,7 @@ public class UserController {
         if(StringUtils.isEmpty(loginCookie)){
             return ServerResponse.createByErrorMessage("用户未登录");
         }
-        String s = RedisPoolUtil.get(loginCookie);
+        String s = RedisSharedPoolUtil.get(loginCookie);
         User currentUser = JsonUtil.string2Bean(s, User.class);
         if(currentUser == null){
             return ServerResponse.createByErrorMessage("用户未登录");
@@ -159,7 +159,7 @@ public class UserController {
         if(StringUtils.isEmpty(loginCookie)){
             return ServerResponse.createByErrorMessage("用户未登录");
         }
-        String s = RedisPoolUtil.get(loginCookie);
+        String s = RedisSharedPoolUtil.get(loginCookie);
         User currentUser = JsonUtil.string2Bean(s, User.class);
         if(currentUser == null){
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"未登录,需要强制登录status=10");
