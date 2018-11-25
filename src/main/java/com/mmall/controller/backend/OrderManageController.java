@@ -39,7 +39,7 @@ public class OrderManageController {
     public ServerResponse<PageInfo> orderList(HttpServletRequest request, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                               @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
 
-        String loginCookie = CookieUtil.readLoginCookie(request);
+        /*String loginCookie = CookieUtil.readLoginCookie(request);
         if (StringUtils.isEmpty(loginCookie)) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -54,14 +54,16 @@ public class OrderManageController {
             return iOrderService.manageList(pageNum, pageSize);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
-        }
+        }*/
+        //填充我们增加产品的业务逻辑
+        return iOrderService.manageList(pageNum, pageSize);
     }
 
     @RequestMapping("detail.do")
     @ResponseBody
     public ServerResponse<OrderVo> orderDetail(HttpServletRequest request, Long orderNo) {
 
-        String loginCookie = CookieUtil.readLoginCookie(request);
+        /*String loginCookie = CookieUtil.readLoginCookie(request);
         if (StringUtils.isEmpty(loginCookie)) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -77,7 +79,9 @@ public class OrderManageController {
             return iOrderService.manageDetail(orderNo);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
-        }
+        }*/
+        //登陆,权限判断,使用拦截器.......
+        return iOrderService.manageDetail(orderNo);
     }
 
 

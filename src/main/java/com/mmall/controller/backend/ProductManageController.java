@@ -44,7 +44,7 @@ public class ProductManageController {
     @RequestMapping("save.do")
     @ResponseBody
     public ServerResponse productSave(HttpServletRequest request, Product product) {
-        String loginCookie = CookieUtil.readLoginCookie(request);
+        /*String loginCookie = CookieUtil.readLoginCookie(request);
         if (StringUtils.isEmpty(loginCookie)) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -59,13 +59,15 @@ public class ProductManageController {
             return iProductService.saveOrUpdateProduct(product);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
-        }
+        }*/
+        //填充我们增加产品的业务逻辑
+        return iProductService.saveOrUpdateProduct(product);
     }
 
     @RequestMapping("set_sale_status.do")
     @ResponseBody
     public ServerResponse setSaleStatus(HttpServletRequest request, Integer productId, Integer status) {
-        String loginCookie = CookieUtil.readLoginCookie(request);
+        /*String loginCookie = CookieUtil.readLoginCookie(request);
         if (StringUtils.isEmpty(loginCookie)) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -79,13 +81,14 @@ public class ProductManageController {
             return iProductService.setSaleStatus(productId, status);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
-        }
+        }*/
+        return iProductService.setSaleStatus(productId, status);
     }
 
     @RequestMapping("detail.do")
     @ResponseBody
     public ServerResponse getDetail(HttpServletRequest request, Integer productId) {
-        String loginCookie = CookieUtil.readLoginCookie(request);
+        /*String loginCookie = CookieUtil.readLoginCookie(request);
         if (StringUtils.isEmpty(loginCookie)) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -101,13 +104,15 @@ public class ProductManageController {
 
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
-        }
+        }*/
+        //填充业务
+        return iProductService.manageProductDetail(productId);
     }
 
     @RequestMapping("list.do")
     @ResponseBody
     public ServerResponse getList(HttpServletRequest request, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        String loginCookie = CookieUtil.readLoginCookie(request);
+        /*String loginCookie = CookieUtil.readLoginCookie(request);
         if (StringUtils.isEmpty(loginCookie)) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -122,13 +127,14 @@ public class ProductManageController {
             return iProductService.getProductList(pageNum, pageSize);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
-        }
+        }*/
+        return iProductService.getProductList(pageNum, pageSize);
     }
 
     @RequestMapping("search.do")
     @ResponseBody
     public ServerResponse productSearch(HttpServletRequest request, String productName, Integer productId, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        String loginCookie = CookieUtil.readLoginCookie(request);
+        /*String loginCookie = CookieUtil.readLoginCookie(request);
         if (StringUtils.isEmpty(loginCookie)) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -143,13 +149,14 @@ public class ProductManageController {
             return iProductService.searchProduct(productName, productId, pageNum, pageSize);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
-        }
+        }*/
+        return iProductService.searchProduct(productName, productId, pageNum, pageSize);
     }
 
     @RequestMapping("upload.do")
     @ResponseBody
     public ServerResponse upload(HttpSession session, @RequestParam(value = "upload_file", required = false) MultipartFile file, HttpServletRequest request) {
-        String loginCookie = CookieUtil.readLoginCookie(request);
+        /*String loginCookie = CookieUtil.readLoginCookie(request);
         if (StringUtils.isEmpty(loginCookie)) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -169,7 +176,14 @@ public class ProductManageController {
             return ServerResponse.createBySuccess(fileMap);
         } else {
             return ServerResponse.createByErrorMessage("无权限操作");
-        }
+        }*/
+        String path = request.getSession().getServletContext().getRealPath("upload");
+        String targetFileName = iFileService.upload(file, path);
+        String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFileName;
+        Map fileMap = Maps.newHashMap();
+        fileMap.put("uri", targetFileName);
+        fileMap.put("url", url);
+        return ServerResponse.createBySuccess(fileMap);
     }
 
 

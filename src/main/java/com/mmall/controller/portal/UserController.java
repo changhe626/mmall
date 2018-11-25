@@ -42,7 +42,7 @@ public class UserController {
     @RequestMapping(value = "login.do",method = {RequestMethod.POST,RequestMethod.GET})
     @ResponseBody
     public ServerResponse<User> login(String username, String password, HttpSession session, HttpServletRequest request, HttpServletResponse httpServletResponse){
-        int j=1/0;
+        //int j=1/0;
 
 
         ServerResponse<User> response = iUserService.login(username,password);
