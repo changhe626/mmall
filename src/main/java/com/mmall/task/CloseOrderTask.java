@@ -1,15 +1,18 @@
 package com.mmall.task;
 
 import com.mmall.common.Const;
+import com.mmall.common.RedissonManager;
 import com.mmall.service.IOrderService;
 import com.mmall.util.PropertiesUtil;
 import com.mmall.util.RedisSharedPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import javax.annotation.PreDestroy;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -17,6 +20,8 @@ public class CloseOrderTask {
 
     @Autowired
     private IOrderService iOrderService;
+    @Autowired
+    private RedissonManager redissonManager;
 
     //每个1分钟执行
     //@Scheduled(cron = "0 */1 * * * ?")
@@ -45,7 +50,10 @@ public class CloseOrderTask {
     }
 
 
-    @Scheduled(cron = "0 */1 * * * ?")
+    /**
+     * 自定义分布式锁
+     */
+    //@Scheduled(cron = "0 */1 * * * ?")
     public void closeOrderTaskV3(){
         log.info("开始定时关闭订单的任务");
         long lockTimeOut=PropertiesUtil.getIntProperty("lock.time.out","5000");
@@ -74,6 +82,33 @@ public class CloseOrderTask {
             log.info("没有获取到分布式锁:{}",Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
         }
         log.info("完成定时关闭订单的任务");
+    }
+
+
+    /**
+     * 使用redisson来进行分布式锁的获取
+     */
+    @Scheduled(cron="0 */1 * * * ?")
+    public void closeOrderTaskV4(){
+        RLock lock = redissonManager.getRedisson().getLock(Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK);
+        boolean getLock = false;
+        try {
+            if(getLock = lock.tryLock(0,50, TimeUnit.SECONDS)){
+                log.info("Redisson获取到分布式锁:{},ThreadName:{}",Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK,Thread.currentThread().getName());
+                int hour = Integer.parseInt(PropertiesUtil.getProperty("close.order.task.time.hour","2"));
+                //iOrderService.closeOrder(hour);
+            }else{
+                log.info("Redisson没有获取到分布式锁:{},ThreadName:{}",Const.REDIS_LOCK.CLOSE_ORDER_TASK_LOCK,Thread.currentThread().getName());
+            }
+        } catch (InterruptedException e) {
+            log.error("Redisson分布式锁获取异常",e);
+        } finally {
+            if(!getLock){
+                return;
+            }
+            lock.unlock();
+            log.info("Redisson分布式锁释放锁");
+        }
     }
 
 
